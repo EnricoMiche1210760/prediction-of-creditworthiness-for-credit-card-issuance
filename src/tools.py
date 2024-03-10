@@ -1,0 +1,107 @@
+import warnings
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+import re
+
+
+from sklearn.compose import ColumnTransformer
+from imblearn.over_sampling import SMOTE
+from imblearn.under_sampling import RandomUnderSampler
+
+from sklearn.preprocessing import OrdinalEncoder, OneHotEncoder, StandardScaler, MinMaxScaler
+from sklearn.model_selection import GridSearchCV, RepeatedStratifiedKFold, train_test_split
+
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import confusion_matrix, classification_report, accuracy_score
+
+from imblearn.ensemble import BalancedRandomForestClassifier, BalancedBaggingClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.neural_network import MLPClassifier
+
+RANDOM_STATE = 7
+
+def rename_columns(df, column_name, new_column_name):
+    df.rename(columns={column_name: new_column_name}, inplace=True)
+    return df
+
+
+def rename_column_without_prefix(X_train, X_test, prefix=None):
+    if prefix is None:
+        print("No prefix specified")
+        return
+    restore_column_name = lambda column: column.replace(prefix, "")
+    X_train.rename(columns=restore_column_name, inplace=True)
+    X_test.rename(columns=restore_column_name, inplace=True)
+
+
+def preprocess_dataframe(data):
+    data.loc[:, 'DAYS_BIRTH'] = data['DAYS_BIRTH'].map(lambda x: int(-x / 365) if x < 0 else 0)
+    data.loc[:, 'DAYS_EMPLOYED'] = data['DAYS_EMPLOYED'].map(lambda x: int(-x / 365) if x < 0 else 0) 
+    data = rename_columns(data, 'DAYS_BIRTH', 'AGE')
+    data = rename_columns(data, 'DAYS_EMPLOYED', 'YEARS_EMPLOYED')
+    data = data.drop(columns=["CODE_GENDER", "CNT_CHILDREN"])
+    return data
+
+
+def show_percentage(plot, crosstab):
+    '''
+    This function plot percentage proportion in bar plots
+    :param plot: plot
+    :param crosstab: crosstab information
+    '''
+    for p in plot.patches:
+        width, height = p.get_width(), p.get_height()
+        x, y = p.get_xy()
+        percentage = height/crosstab.sum(axis=1) * 100
+        if percentage.iloc[0] > 0:
+            plot.text(x + width/2, y + height/2, f"{percentage.iloc[0]:.2f}%",
+                horizontalalignment='center', verticalalignment='center',
+                color='black') 
+
+
+def generate_confusion_matrix(axes : plt.Axes, matrix : np.ndarray, title=None):
+    axes.text(0, 2.3, f"Precision: {(matrix[1][1]/(matrix[1][1]+matrix[0][1])):.3f}") 
+    axes.text(1, 2.3, f"Recall: {(matrix[1][1]/(matrix[1][1]+matrix[1][0])):.3f}") 
+    axes.xaxis.set_ticklabels(['Predicted Good Client', 'Predicted Bad Client'])
+    axes.yaxis.set_ticklabels(['Good Client', 'Bad Client'])
+    if title:
+        axes.set_title(title, fontsize=10.5)
+    return axes
+
+def print_train_test_confusion_matrix(train_matrix : np.ndarray, test_matrix : np.ndarray, train_title=None, test_title=None):
+    fig, (ax1, ax2) = plt.subplots(1,2, figsize=(15, 5))
+    sns.heatmap(train_matrix, annot=True, cmap="Greens", fmt='g', ax=ax1)
+    ax1 = generate_confusion_matrix(ax1, train_matrix, train_title)
+
+    sns.heatmap(test_matrix, annot=True, cmap="Greens", fmt='g', ax=ax2)
+    ax2 = generate_confusion_matrix(ax2, test_matrix, test_title)
+    plt.show()
+
+def get_accuracy_from_classification_report(report):
+    numerical_values = re.findall(r"[-+]?\d*\.\d+|\d+", report.split("\n")[5])
+    return float(numerical_values[0])
+
+def perform_logistic_regression(X_train, y_train, X_test, y_test, threshold=0.5, class_weight=None):
+    log_reg = LogisticRegression(random_state=RANDOM_STATE, class_weight=class_weight, max_iter=1000)
+    log_reg.fit(X_train, y_train)
+    y_pred_proba = log_reg.predict_proba(X_train)
+    y_pred_train = np.where(y_pred_proba[:,1]>threshold, 1, 0)
+    report = classification_report(y_train, y_pred_train)
+    accuracy = get_accuracy_from_classification_report(report)
+    print("Train Set Accuracy: ", accuracy)
+    print(report)
+    print("--------------------")
+
+    y_pred_proba = log_reg.predict_proba(X_test)
+    y_pred = np.where(y_pred_proba[:,1]>threshold, 1, 0)
+    report_test = classification_report(y_test, y_pred)
+    accuracy_test = get_accuracy_from_classification_report(report_test)
+    print("Test Set Accuracy: ", accuracy_test)
+    print(report_test)
+    print_train_test_confusion_matrix(train_matrix=confusion_matrix(y_train, y_pred_train), test_matrix=confusion_matrix(y_test, y_pred), 
+                           train_title="Train Set\n\n", test_title="Test Set\n\n")
+    return log_reg, report, report_test
+
+
