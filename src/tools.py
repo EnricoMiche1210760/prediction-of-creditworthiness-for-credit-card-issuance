@@ -64,8 +64,8 @@ def show_percentage(plot, crosstab):
 def generate_confusion_matrix(axes : plt.Axes, matrix : np.ndarray, title=None):
     axes.text(0, 2.3, f"Precision: {(matrix[1][1]/(matrix[1][1]+matrix[0][1])):.3f}") 
     axes.text(1, 2.3, f"Recall: {(matrix[1][1]/(matrix[1][1]+matrix[1][0])):.3f}") 
-    axes.xaxis.set_ticklabels(['Predicted Good Client', 'Predicted Bad Client'])
-    axes.yaxis.set_ticklabels(['Good Client', 'Bad Client'])
+    axes.xaxis.set_ticklabels(['Predicted Good Customer', 'Predicted Bad Customer'])
+    axes.yaxis.set_ticklabels(['Good Customer', 'Bad Customer'])
     if title:
         axes.set_title(title, fontsize=10.5)
     return axes

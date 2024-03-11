@@ -1,4 +1,4 @@
-class Client:
+class Customer:
     def __init__(self, id, info, credit_info):
         self.id = id
         self._info = info
