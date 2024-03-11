@@ -39,7 +39,7 @@ class Customer:
             return 6
         return 7
 
-    def get_last_period_reliability(self):
+    def get_last_period_reliability(self): #da rivedere!!!!!!!!
         last_period_check = 6
         reliability = 7
         i = 0
@@ -63,7 +63,7 @@ class Customer:
             i+=1
         return reliability
         
-    def set_reliability(self):
+    def compute_reliability(self):
         self.reliability = int((self.get_history_reliability() * 0.75 + self.get_last_period_reliability() * 0.25))
         if self.reliability < 5:
             self.bad_client = 1
@@ -71,12 +71,12 @@ class Customer:
 
     def get_reliability(self):
         if not self._reliability_setted:
-            self.set_reliability()
+            self.compute_reliability()
         return self.reliability
     
     def get_bad_client(self):
         if not self._reliability_setted:
-            self.set_reliability()
+            self.compute_reliability()
         return self.bad_client
 
     def get_client_status(self):
