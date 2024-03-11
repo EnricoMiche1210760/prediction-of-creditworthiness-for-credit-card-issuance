@@ -1,4 +1,4 @@
-src/__pycache__/tools.cpython-311.pyc
-src/clients_handler/__pycache__/Client.cpython-311.pyc
-src/clients_handler/__pycache__/__init__.cpython-311.pyc
+src/__pycache__/*
+src/clients_handler/__pycache__/*
+src/clients_handler/__pycache__/*
 project_env/*
