@@ -51,15 +51,15 @@ class Customer:
             elif row['STATUS'] == '3':
                 reliability = 1
             elif row['STATUS'] == '2':
-                reliability = 2
+                reliability = reliability*0.35
             elif row['STATUS'] == '1':
-                reliability = 4
+                reliability = reliability*1.1 if reliability*1.1 < 3 else reliability*0.65
             elif row['STATUS'] == '0':
-                reliability = 5
+                reliability = reliability*1.2 if reliability*1.2 < 5 else reliability
             elif row['STATUS'] == 'C':
-                reliability = reliability*1.1 if reliability*1.1 < 6 else reliability
+                reliability = reliability*1.25 if reliability*1.25 < 6 else reliability
             elif row['STATUS'] == 'X':
-                reliability = reliability*1.25 if reliability*1.25 < 7 else 7
+                reliability = reliability*1.35 if reliability*1.35 < 7 else 7
             i+=1
         return reliability
         
