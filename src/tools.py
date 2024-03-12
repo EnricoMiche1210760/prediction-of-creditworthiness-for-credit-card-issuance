@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import re
 
-
+from scipy.stats import chi2_contingency
 from sklearn.compose import ColumnTransformer
 from imblearn.over_sampling import SMOTE
 from imblearn.under_sampling import RandomUnderSampler
@@ -105,3 +105,18 @@ def perform_logistic_regression(X_train, y_train, X_test, y_test, threshold=0.5,
     return log_reg, report, report_test
 
 
+def chi_squared_test(data, feature1, feature2):
+    '''
+    This function performs a chi-squared test of independence between two categorical variables
+    and prints the p-value of the test.
+    :param data: the dataframe containing the features
+    :param feature1: the first feature
+    :param feature2: the second feature
+    '''
+    crosstab = pd.crosstab(data[feature1], data[feature2])
+    chi2, p, _, _ = chi2_contingency(crosstab)
+    print(f"Chi2: {chi2:.2f}, p-value: {p:.2f}")
+    if(p < 0.05):
+        print(f"Features {feature1} and {feature2} are dependent")
+    else:
+        print(f"Features {feature1} and {feature2} are independent")
