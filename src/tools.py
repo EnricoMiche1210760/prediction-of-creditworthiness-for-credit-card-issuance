@@ -83,6 +83,11 @@ def get_accuracy_from_classification_report(report):
     numerical_values = re.findall(r"[-+]?\d*\.\d+|\d+", report.split("\n")[5])
     return float(numerical_values[0])
 
+def get_info_from_classification_report(report):
+    numerical_values_class0 = re.findall(r"[-+]?\d*\.\d+|\d+", report.split("\n")[2])
+    numerical_values_class1 = re.findall(r"[-+]?\d*\.\d+|\d+", report.split("\n")[3])
+    return float(numerical_values_class0[1]), float(numerical_values_class0[2]), float(numerical_values_class1[1]), float(numerical_values_class1[2])
+
 def perform_logistic_regression(X_train, y_train, X_test, y_test, threshold=0.5, class_weight=None):
     log_reg = LogisticRegression(random_state=RANDOM_STATE, class_weight=class_weight, max_iter=1000)
     log_reg.fit(X_train, y_train)
