@@ -88,6 +88,22 @@ def get_info_from_classification_report(report):
     numerical_values_class1 = re.findall(r"[-+]?\d*\.\d+|\d+", report.split("\n")[3])
     return float(numerical_values_class0[1]), float(numerical_values_class0[2]), float(numerical_values_class1[1]), float(numerical_values_class1[2])
 
+def get_dict_from_classification_report(report_train, report_test):
+    precision_good_cl, recall_good_cl, precision_bad_cl, recall_bad_cl = get_info_from_classification_report(report_train)
+    precision_good_cl_test, recall_good_cl_test, precision_bad_cl_test, recall_bad_cl_test = get_info_from_classification_report(report_test)
+    return {
+        "Train_accuracy": get_accuracy_from_classification_report(report_train), 
+        "Test_accuracy": get_accuracy_from_classification_report(report_test), 
+        "Train_precision_good_cl": precision_good_cl,
+        "Train_recall_good_cl": recall_good_cl,
+        "Train_precision_bad_cl": precision_bad_cl,
+        "Train_recall_bad_cl": recall_bad_cl,
+        "Test_precision_good_cl": precision_good_cl_test,
+        "Test_recall_good_cl": recall_good_cl_test,
+        "Test_precision_bad_cl": precision_bad_cl_test,
+        "Test_recall_bad_cl": recall_bad_cl_test
+    }
+
 def perform_logistic_regression(X_train, y_train, X_test, y_test, threshold=0.5, class_weight=None):
     log_reg = LogisticRegression(random_state=RANDOM_STATE, class_weight=class_weight, max_iter=1000)
     log_reg.fit(X_train, y_train)
