@@ -23,11 +23,23 @@ from sklearn.neural_network import MLPClassifier
 RANDOM_STATE = 7
 
 def rename_columns(df, column_name, new_column_name):
+    '''
+    This function renames a column in a dataframe
+    :param df: the dataframe
+    :param column_name: the name of the column to be renamed
+    :param new_column_name: the new name of the column
+    '''
     df.rename(columns={column_name: new_column_name}, inplace=True)
     return df
 
 
 def rename_column_without_prefix(X_train, X_test, prefix=None):
+    '''
+    This function removes a prefix from the column names of the training and test sets
+    :param X_train: the training set
+    :param X_test: the test set
+    :param prefix: the prefix to be removed
+    '''
     if prefix is None:
         print("No prefix specified")
         return
@@ -37,6 +49,11 @@ def rename_column_without_prefix(X_train, X_test, prefix=None):
 
 
 def preprocess_dataframe(data):
+    '''
+    This function preprocesses the dataframe by renaming columns and transforming 
+    some features from days to years.
+    :param data: the dataframe
+    '''
     data.loc[:, 'DAYS_BIRTH'] = data['DAYS_BIRTH'].map(lambda x: int(-x / 365) if x < 0 else 0)
     data.loc[:, 'DAYS_EMPLOYED'] = data['DAYS_EMPLOYED'].map(lambda x: int(-x / 365) if x < 0 else 0) 
     data = rename_columns(data, 'DAYS_BIRTH', 'AGE')
@@ -62,6 +79,12 @@ def show_percentage(plot, crosstab):
 
 
 def generate_confusion_matrix(axes : plt.Axes, matrix : np.ndarray, title=None):
+    '''
+    This function generates a confusion matrix
+    :param axes (matplotlib.pyplot.Axes): the axes
+    :param matrix (numpy.ndarray): the confusion matrix
+    :param title: the title of the confusion matrix
+    '''
     axes.text(0, 2.3, f"Precision: {(matrix[1][1]/(matrix[1][1]+matrix[0][1])):.3f}") 
     axes.text(1, 2.3, f"Recall: {(matrix[1][1]/(matrix[1][1]+matrix[1][0])):.3f}") 
     axes.xaxis.set_ticklabels(['Predicted Good Customer', 'Predicted Bad Customer'])
@@ -71,6 +94,13 @@ def generate_confusion_matrix(axes : plt.Axes, matrix : np.ndarray, title=None):
     return axes
 
 def print_train_test_confusion_matrix(train_matrix : np.ndarray, test_matrix : np.ndarray, train_title=None, test_title=None):
+    '''
+    This function prints the confusion matrix for the training and test sets
+    :param train_matrix (numpy.ndarray): the confusion matrix for the training set
+    :param test_matrix (numpy.ndarray): the confusion matrix for the test set
+    :param train_title: the title of the confusion matrix for the training set
+    :param test_title: the title of the confusion matrix for the test set
+    '''
     fig, (ax1, ax2) = plt.subplots(1,2, figsize=(15, 5))
     sns.heatmap(train_matrix, annot=True, cmap="Greens", fmt='g', ax=ax1)
     ax1 = generate_confusion_matrix(ax1, train_matrix, train_title)
@@ -80,15 +110,28 @@ def print_train_test_confusion_matrix(train_matrix : np.ndarray, test_matrix : n
     plt.show()
 
 def get_accuracy_from_classification_report(report):
+    '''
+    This function extracts the accuracy from a classification report
+    :param report: the classification report
+    '''
     numerical_values = re.findall(r"[-+]?\d*\.\d+|\d+", report.split("\n")[5])
     return float(numerical_values[0])
 
 def get_info_from_classification_report(report):
+    '''
+    This function extracts the precision and recall from a classification report
+    :param report: the classification report
+    '''
     numerical_values_class0 = re.findall(r"[-+]?\d*\.\d+|\d+", report.split("\n")[2])
     numerical_values_class1 = re.findall(r"[-+]?\d*\.\d+|\d+", report.split("\n")[3])
     return float(numerical_values_class0[1]), float(numerical_values_class0[2]), float(numerical_values_class1[1]), float(numerical_values_class1[2])
 
 def get_dict_from_classification_report(report_train, report_test):
+    '''
+    This function extracts the accuracy, precision and recall from a classification report and returns them in a dictionary
+    :param report_train: the classification report for the training set
+    :param report_test: the classification report for the test set
+    '''
     precision_good_cl, recall_good_cl, precision_bad_cl, recall_bad_cl = get_info_from_classification_report(report_train)
     precision_good_cl_test, recall_good_cl_test, precision_bad_cl_test, recall_bad_cl_test = get_info_from_classification_report(report_test)
     return {
@@ -105,6 +148,15 @@ def get_dict_from_classification_report(report_train, report_test):
     }
 
 def perform_logistic_regression(X_train, y_train, X_test, y_test, threshold=0.5, class_weight=None):
+    '''
+    This function performs logistic regression and prints the classification report and confusion matrix for the training and test sets
+    :param X_train: the training set
+    :param y_train: the training labels
+    :param X_test: the test set
+    :param y_test: the test labels
+    :param threshold: the threshold for the logistic regression
+    :param class_weight: the class weight
+    '''
     log_reg = LogisticRegression(random_state=RANDOM_STATE, class_weight=class_weight, max_iter=1000)
     log_reg.fit(X_train, y_train)
     y_pred_proba = log_reg.predict_proba(X_train)
