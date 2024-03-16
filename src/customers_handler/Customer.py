@@ -1,5 +1,11 @@
 class Customer:
     def __init__(self, id, info, credit_info):
+        '''
+        Function to initialize the class
+        :param id: the id of the customer
+        :param info: the info of the customer
+        :param credit_info: the credit info of the customer
+        '''
         self.id = id
         self._info = info
         self._credit_info = credit_info
@@ -23,6 +29,10 @@ class Customer:
                 self.pay_stats[k] = self.status[k]/self.history
 
     def get_history_reliability(self):        
+        '''
+        Function to get the reliability of the client based on the history
+        :return: the reliability of the client based on the history
+        '''
         if self.pay_stats['5'] > 0.05: 
             return 0
         elif self.pay_stats['4'] > 0.05:
@@ -39,7 +49,11 @@ class Customer:
             return 6
         return 7
 
-    def get_last_period_reliability(self): #da rivedere!!!!!!!!
+    def get_last_period_reliability(self): 
+        '''
+        Function to get the reliability of the client based on the last period
+        :return: the reliability of the client based on the last six months
+        '''
         last_period_check = 6
         reliability = 7
         i = 0
@@ -64,23 +78,40 @@ class Customer:
         return reliability
         
     def compute_reliability(self):
+        '''
+        Function to compute the reliability of the client
+        '''
         self.reliability = int((self.get_history_reliability() * 0.75 + self.get_last_period_reliability() * 0.25))
         if self.reliability < 5:
             self.bad_client = 1
         self._reliability_setted = True
 
     def get_reliability(self):
+        '''
+        Function to get the reliability of the client
+        :return: the reliability of the client
+        '''
         if not self._reliability_setted:
             self.compute_reliability()
         return self.reliability
     
     def get_bad_client(self):
+        '''
+        Function to get if the client is a bad client
+        :return: if the client is a bad client
+        '''
         if not self._reliability_setted:
             self.compute_reliability()
         return self.bad_client
 
     def get_client_status(self):
+        '''
+        Function to get the status of the client
+        '''
         return self.status
     
     def get_client_history(self):
+        '''
+        Function to get the history of the client
+        '''
         return self.history

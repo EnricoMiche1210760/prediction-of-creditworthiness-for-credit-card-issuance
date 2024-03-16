@@ -21,7 +21,7 @@ The application dataset contains the following features:
 - `FLAG_PHONE`: whether the client provided a phone number or not;
 - `FLAG_EMAIL`: whether the client provided an email or not;
 - `OCCUPATION_TYPE`: the occupation of the client;
-- `CNT_FAM_MEMBERS`: the number of family members of the client.<br><br>
+- `CNT_FAM_MEMBERS`: the number of family members of the client.
 
 
 The credit card dataset contains the following features:
